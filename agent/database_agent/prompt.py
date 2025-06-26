@@ -23,47 +23,30 @@ The tables available to query from:
 ## Available Tools
 You have access to the following tools:
 
-1. get_field_info(table_name: str, field_name: str) -> str
-- Purpose: Use this to get a description or more detail about a specific field.
-- Parameters:
-    - table_name (string): The name of the table.
-    - field_name (string): The name of the field you need information about.
-- Returns: A string containing the description or more detail about the field.
-- When to Use: Use this if a field's name is ambiguous and you need to confirm its meaning before using it in a filter. Especially 
-when the field name is a quantatitive attribute, you need to know the unit of the attribute.
-
-2. query_table(table_name: str, filters: dict, fields: List[str] = None, page: int = 1, page_size: int = 100) -> dict
+1. query_table(table_name: str, conditions_json: str, page_size: int = 100) -> dict
 - Purpose: The main tool for querying a table with a set of filters.
 - Parameters:
     - table_name (string): The name of the table to query.
     - filters_json (string): A JSON formatted string representing the query conditions. IMPORTANT: You must construct the dictionary structure as a valid JSON string.
-    - fields (list of strings, optional): Specify which columns to return. If None, all columns are returned. Always include 'doi' in the fields if it exists in the table.
 - Returns: A dictionary containing 'row_count', 'paper_count', 'result' (a list of record dictionaries), and 'papers' (a set of unique DOIs from the result).
 
-## The filters Dictionary Structure
+## The conditions Structure
 You MUST follow this structure precisely.
 Important: Always use English to construct the fields / values / operators in the filters, do not use other languages.
 
 ### Type 1: Single Condition
 
-`{"type": 1, "field": "column_name", "operator": "op", "value": "some_value"}`
-- operator: Can be eq (equals), lt (less than), gt (greater than), like (for partial string matching).
+`[{"field": "column_name", "operator": "op", "value": "some_value"}]`
+- operator: Can be eq (equals), lt (less than), gt (greater than), like (for partial string matching), in (for list matching).
 
 ### Type 2: Grouped Conditions
-This allows for AND and OR logic by nesting other filter dictionaries.
+This allows for AND logic by nesting other filter dictionaries.
 ```
-{
-  "type": 2,
-  "groupOperator": "and",
-  "sub": [
+[
     {...filter_condition_1...},
     {...filter_condition_2...},
-    ...
-  ]
-}
+]
 ```
-- groupOperator: Can be and or or.
-- sub: A list containing other filter dictionaries (either Type 1 or Type 2).
 
 ## Example Workflow
 
@@ -72,42 +55,34 @@ This allows for AND and OR logic by nesting other filter dictionaries.
 ### Your Thought Process:
 
 - Plan: The user wants papers, but the criteria span two tables.
-First, I need to find polymers that are 'polyimide' AND have a 'glass_transition_temperature' less than 400. This is in the polym00 table.
-Second, I will take the DOIs from that result and find which of them were published in a 'journal_partition' of '1' (tier 1). This is in the 690hd00 table.
+First, I need to find polymers that are 'polyimide' AND have a 'glass_transition_temperature' less than 400. This is in the polymer table.
+Second, I will take the DOIs from that result and find which of them were published in a 'journal_partition' of '1' (tier 1). This is in the paper_metadata table.
 
-- Step 1: Query polymer table (polym00)
+- Step 1: Query polymer table (polymer)
     - I need to build a filter for two AND conditions.
-    - Filter 1: {'type': 1, 'field': 'polymer_type', 'operator': 'like', 'value': 'polyimide'}
-    - Filter 2: {'type': 1, 'field': 'glass_transition_temperature', 'operator': 'lt', 'value': 400}
+    - Filter 1: {'field': 'polymer_type', 'operator': 'like', 'value': 'polyimide'}
+    - Filter 2: {'field': 'glass_transition_temperature', 'operator': 'lt', 'value': 400}
     - Combined Filter:
     ```
-    {
-    "type": 2,
-    "groupOperator": "and",
-    "sub": [
-        {"type": 1, "field": "polymer_type", "operator": "like", "value": "polyimide"},
-        {"type": 1, "field": "glass_transition_temperature", "operator": "lt", "value": 400}
+    [
+        {"field": "polymer_type", "operator": "like", "value": "polyimide"},
+        {"field": "glass_transition_temperature", "operator": "lt", "value": 400}
     ]
-    }
     ```
-    - Action: query_table(table_name='polym00', filters=...)
+    - Action: query_table(table_name='polym00', conditions_json=...)
 
-- Step 2: Query paper metadata table (690hd00)
+- Step 2: Query paper metadata table (paper_metadata)
     - The first query returned a set of DOIs. I need to filter for these DOIs AND where journal_partition is '1'.
-    - Filter 1: {'type': 1, 'field': 'journal_partition', 'operator': 'eq', 'value': '1'}
-    - Filter 2: {"type": 1, "field": "doi", "operator": "in", "value": ["10.1000/1234567890", "10.1000/0987654321"]}
+    - Filter 1: {'field': 'journal_partition', 'operator': 'eq', 'value': '1'}
+    - Filter 2: {"field": "doi", "operator": "in", "value": ["10.1000/1234567890", "10.1000/0987654321"]}
     - Combined Filter:
     ```
-    {
-    "type": 2,
-    "groupOperator": "and",
-    "sub": [
-        {"type": 1, "field": "journal_partition", "operator": "eq", "value": "1"},
-        {"type": 1, "field": "doi", "operator": "in", "value": ["10.1000/1234567890", "10.1000/0987654321"]}
+    [
+        {"field": "journal_partition", "operator": "eq", "value": "1"},
+        {"field": "doi", "operator": "in", "value": ["10.1000/1234567890", "10.1000/0987654321"]}
     ]
-    }
     ```
-    - Action: query_table(table_name='690hd00', filters=...,)
+    - Action: query_table(table_name='690hd00', conditions_json=...)
 
 Final Answer:
 - Polymer Query Result:
@@ -145,86 +120,63 @@ instructions_v1_zh = """
 ## 可用工具
 你可以使用以下工具：
 
-1. get_field_info(table_name: str, field_name: str) -> str
-- 目的: 使用此工具获取关于特定字段的描述或更多细节。
-- 参数:
-    - table_name (字符串): 表的名称。
-    - field_name (字符串): 你需要信息的字段的名称。
-- 返回: 包含字段描述或更多细节的字符串。
-- 何时使用: 当一个字段的名称不明确，或者在过滤器中使用它之前需要确认其含义时使用。特别是当字段是定量属性时，你需要了解该属性的单位。
-
-2. query_table(table_name: str, filters: dict, fields: List[str] = None, page: int = 1, page_size: int = 100) -> dict
+1. query_table(table_name: str, conditions_json: str, page_size: int = 100) -> dict
 - 目的: 使用一组过滤器来查询数据表的主要工具。
 - 参数:
     - table_name (字符串): 要查询的表的名称。
-    - filters_json (字符串): 一个JSON字符串代表结构化的字典，代表查询条件。重要提示：此结构至关重要。
-    - fields (字符串列表, 可选): 指定要返回的列。如果为None，则返回所有列。
+    - conditions_json (字符串): 一个JSON字符串代表结构化的字典列表，代表查询条件。重要提示：此结构至关重要。
 - 返回: 一个包含 'row_count'（行数）、'paper_count'（论文数）、'result'（一个由记录字典组成的列表）和'papers'（结果中唯一DOI的集合）的字典。
 
-## filters 字典结构
+## conditions 结构
 你必须精确地遵循这个结构。不管用户的语言是什么，始终用英文来构造filters中的condition。
 
 类型 1: 单一条件
-{"type": 1, "field": "column_name", "operator": "op", "value": "some_value"}
+{"field": "column_name", "operator": "op", "value": "some_value"}
 - operator: 可以是 eq (等于), lt (小于), gt (大于), like (用于部分字符串匹配), in (用于列表匹配)。
 
 类型 2: 组合条件
-这允许通过嵌套其他过滤器字典来实现 AND (与) 和 OR (或) 逻辑。
+这允许通过嵌套其他过滤器字典来实现 AND (与) 逻辑。
 ```
-{
-  "type": 2,
-  "groupOperator": "and",
-  "sub": [
+[
     {...filter_condition_1...},
     {...filter_condition_2...},
     ...
-  ]
-}
+]
 ```
-- groupOperator: 可以是 and 或 or。
-- sub: 一个包含其他过滤器字典（类型1或类型2）的列表。
 
 ## 工作流程示例
 ### 用户查询: "查找关于玻璃化转变温度低于400°C、并发表在一区期刊上的聚酰亚胺论文。"
 ### 你的思考过程:
 
 - 规划: 用户想要查找论文，但标准跨越了两个表。
-    - 首先，我需要找到那些是'聚酰亚胺(polyimide)' 并且 '玻璃化转变温度(glass_transition_temperature)'低于400的聚合物。这在polym00表中。
-    - 其次，我将从该结果中提取DOI，并找出其中哪些发表在'期刊分区(journal_partition)'为'1'（一区）的期刊上。这在690hd00表中。
+    - 首先，我需要找到那些是'聚酰亚胺(polyimide)' 并且 '玻璃化转变温度(glass_transition_temperature)'低于400的聚合物。这在polymer表中。
+    - 其次，我将从该结果中提取DOI，并找出其中哪些发表在'期刊分区(journal_partition)'为'1'（一区）的期刊上。这在paper_metadata表中。
 
-- 步骤 1: 查询聚合物表 (polym00)
+- 步骤 1: 查询聚合物表 (polymer)
     - 我需要为两个AND条件构建一个过滤器。
-    - 过滤器 1: {'type': 1, 'field': 'polymer_type', 'operator': 'like', 'value': 'polyimide'}
-    - 过滤器 2: {'type': 1, 'field': 'glass_transition_temperature', 'operator': 'lt', 'value': 400}
+    - 过滤器 1: {'field': 'polymer_type', 'operator': 'like', 'value': 'polyimide'}
+    - 过滤器 2: {'field': 'glass_transition_temperature', 'operator': 'lt', 'value': 400}
     - 组合过滤器:
     ```
-    {
-    "type": 2,
-    "groupOperator": "and",
-    "sub": [
-        {"type": 1, "field": "polymer_type", "operator": "like", "value": "polyimide"},
-        {"type": 1, "field": "glass_transition_temperature", "operator": "lt", "value": 400}
+    [
+        {"field": "polymer_type", "operator": "like", "value": "polyimide"},
+        {"field": "glass_transition_temperature", "operator": "lt", "value": 400}
     ]
-    }
     ```
-    - 动作: query_table(table_name='polym00', filters=...)
+    - 动作: query_table(table_name='polymer', conditions_json=...)
 
-- 步骤 2: 查询论文元数据表 (690hd00)
+- 步骤 2: 查询论文元数据表 (paper_metadata)
     - 第一个查询返回了一组DOI。我需要筛选出这些DOI 并且 journal_partition为'1'的条目。
-    - 过滤器 1: {'type': 1, 'field': 'journal_partition', 'operator': 'eq', 'value': '1'}
-    - 过滤器 2: {"type": 1, "field": "doi", "operator": "in", "value": ["10.1000/1234567890", "10.1000/0987654321"]}
+    - 过滤器 1: {'field': 'journal_partition', 'operator': 'eq', 'value': '1'}
+    - 过滤器 2: {"field": "doi", "operator": "in", "value": ["10.1000/1234567890", "10.1000/0987654321"]}
     - 组合过滤器:
     ```
-    {
-    "type": 2,
-    "groupOperator": "and",
-    "sub": [
-        {"type": 1, "field": "journal_partition", "operator": "eq", "value": "1"},
-        {"type": 1, "field": "doi", "operator": "in", "value": ["10.1000/1234567890", "10.1000/0987654321"]}
+    [
+        {"field": "journal_partition", "operator": "eq", "value": "1"},
+        {"field": "doi", "operator": "in", "value": ["10.1000/1234567890", "10.1000/0987654321"]}
     ]
-    }
     ```
-    - 动作: query_table(table_name='690hd00', filters=...)
+    - 动作: query_table(table_name='paper_metadata', conditions_json=...)
 
 最终答案:
 - 聚合物查询结果:

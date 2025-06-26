@@ -22,31 +22,6 @@ def save_response(callback_context: CallbackContext, llm_response: LlmResponse) 
             f.write(f"response: {original_text}")
 
 
-def mock_construct_messages(paper_url):
-    file_path = paper_url
-    with open(file_path, 'r', encoding='utf-8') as file:
-        raw_content = json.load(file)
-    raw_paper_content = raw_content['text']
-    paper_str = json.dumps(raw_paper_content, ensure_ascii=False, default=str)
-    return paper_str
-
-
-def mock_construct_picture_mapping(picture_url):
-    file_path = picture_url
-    with open(file_path, 'r', encoding='utf-8') as file:
-        raw_content = json.load(file)
-    picture_mapping_str = json.dumps(raw_content, ensure_ascii=False, default=str)
-    return picture_mapping_str
-
-
-def mock_get_paper_content_and_picture(paper_url):
-    dir_part = os.path.dirname(paper_url)
-    picture_url = os.path.join(dir_part, "figure_mappings.json")
-    message = mock_construct_messages(paper_url)
-    picture_mapping = mock_construct_picture_mapping(picture_url)
-    return message, picture_mapping
-
-
 def create_update_invoke_message_with_agent_name(agent_name: str):
     def update_invoke_message_with_agent_name(
             callback_context: CallbackContext,
@@ -61,7 +36,7 @@ def create_update_invoke_message_with_agent_name(agent_name: str):
         # message, picture_mapping = mock_get_paper_content_and_picture(paper_url)
 
         # query paper content and picture from database
-        db_manager = DatabaseManager(callback_context.state['db_name'])
+        db_manager = DatabaseManager()
         fetch_paper_content = db_manager.init_fetch_paper_content()
         paper_content = fetch_paper_content(paper_url)
         message = paper_content.get('main_txt', '')
@@ -76,9 +51,6 @@ def create_update_invoke_message_with_agent_name(agent_name: str):
                 if picture_mapping is not None:
                     contents.append(types.Content(role="user", parts=[types.Part(text=f"picture_mapping:{picture_mapping}")]))
                 llm_request.contents = llm_request.contents + contents
-
-            output_file = "llm_contents_reader.json"
-            save_llm_request(llm_request, output_file)
         except:
             print(llm_request.contents[-1].role, llm_request.contents[-1].parts[0])
         return None  # 原函数没有返回值，保持一致

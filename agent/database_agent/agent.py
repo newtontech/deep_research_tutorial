@@ -11,11 +11,6 @@ from ..llm_config import create_default_config
 from ..tools.database import DatabaseManager
 
 
-def update_invoke_message(callback_context: CallbackContext, llm_request: LlmRequest):
-    print(llm_request.config.system_instruction)
-    return
-
-
 def save_query_results(
         tool: BaseTool, args: Dict[str, Any], tool_context: ToolContext, tool_response: Any
     ) -> None:
@@ -36,8 +31,7 @@ def save_query_results(
 def init_database_agent(config):
     """Initialize the database agent with the given configuration."""
     selected_model = config.gpt_4o
-    db_manager = DatabaseManager(config.db_name)
-    get_table_field_info = db_manager.init_get_table_field_info()
+    db_manager = DatabaseManager()
     query_table = db_manager.init_query_table()
 
     database_agent = LlmAgent(
@@ -45,9 +39,8 @@ def init_database_agent(config):
         model=selected_model,
         instruction=instructions_v1,
         description="Construct database queries based on user's question and summarize the results.",
-        tools=[get_table_field_info, query_table],
+        tools=[query_table],
         output_key="query_result",
-        before_model_callback=update_invoke_message,
         after_tool_callback=save_query_results,
     )
     return database_agent
