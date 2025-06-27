@@ -95,7 +95,7 @@ instructions_v2_zh = """
 # 图表引用
     - 若报告中关键信息来自于原论文的图表或图片，需在报告中引用这些图表。
     - 若论文的精读结果中没有图表，则不需要输出图表
-    - 以markdown中内嵌html的形式输出,并设定图片大小：<img src="图片路径" alt="图片描述" width="400"/>
+    - 图片引用格式为markdown格式：![图片描述](图片路径)
     - 请保证url与论文的精读结果中引用完全相同，确保格式正确以正确渲染。
     - 控制图片数量在10张以内。
     - 仅在报告中展示图片引用，无需在报告末尾显示图片来源
@@ -133,7 +133,7 @@ instructions_v2_en = """
 # Figure and Table
     - If the report contains figures or tables that are directly referenced from the original paper, they should be included in the report.
     - If no figures provided in the findings, you should not include figures in the report.
-    - Output in html format embedded in the markdown file with a fixed width: <img src="figure_url" alt="caption" width="400"/>
+    - Figure reference format: ![figure description](figure url)
     - Ensure that the url matches the url in the original paper's in-depth reading results.
     - Keep the figure count below 10.
     - Only use figures in the report, do not display the source of the figure at the end of the report.
