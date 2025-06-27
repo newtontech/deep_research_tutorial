@@ -12,23 +12,6 @@ from .paper_agent.agent import init_paper_agent
 from .report_agent.agent import init_report_agent
 
 
-def mock_paper_list_before_agent(callback_context: CallbackContext):
-    # 获取相关文献列表
-    paper_list = {
-        'paper1': r'D:\\Code\\DPT\\bohrium-agents\\agents\\chemistry_agent\\data\\output_data\\10.1002\\elan.202400167\\elan.202400167.json',
-        'paper2': r'D:\\Code\\DPT\\bohrium-agents\\agents\\chemistry_agent\\data\\output_data\\10.1002\\aenm.201803372\\aenm.201803372.json',
-        'paper3': r'D:\Code\DPT\bohrium-agents\agents\chemistry_agent\data/output_data/10.1002/anie.201807034/anie.201807034.json',
-        'paper4': r'D:\Code\DPT\bohrium-agents\agents\chemistry_agent\data/output_data/10.1002/anie.202410020/anie.202410020.json',
-        'paper5': r'D:\Code\DPT\bohrium-agents\agents\chemistry_agent\data/output_data/10.1016/j.electacta.2017.10.134/j.electacta.2017.10.134.json'}
-        # 'paper6': r'D:\Code\DPT\bohrium-agents\agents\chemistry_agent\data/output_data/10.1016/j.electacta.2018.05.078/j.electacta.2018.05.078.json',
-        # 'paper7': r'D:\Code\DPT\bohrium-agents\agents\chemistry_agent\data/output_data/10.1016/j.jpowsour.2013.06.005/j.jpowsour.2013.06.005.json',
-        # 'paper8': r'D:\Code\DPT\bohrium-agents\agents\chemistry_agent\data/output_data/10.1016/j.jpowsour.2016.07.056/j.jpowsour.2016.07.056.json',
-        # 'paper9': r'D:\Code\DPT\bohrium-agents\agents\chemistry_agent\data/output_data/10.1039/d0qm01134g/d0qm01134g.json',
-        # 'paper10': r'D:\Code\DPT\bohrium-agents\agents\chemistry_agent\data/output_data/10.1039/d1cc02829d/d1cc02829d.json'}
-
-    callback_context.state['paper_list'] = paper_list
-    return
-
 def paper_list_before_agent(callback_context: CallbackContext):
     if (
         callback_context.state.get('database_agent_tool_call', None) is None
