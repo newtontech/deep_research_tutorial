@@ -60,7 +60,7 @@ def create_update_invoke_message_with_agent_name(agent_name: str):
 def init_paper_agent(config, name, run_id):
     """Initialize the researcher agent with the given configuration."""
     # Select the model based on the configuration
-    selected_model = config.gemini_2_5_flash
+    selected_model = config.deepseek_chat
     # selected_model = config.gpt_4o
 
     paper_agent = LlmAgent(

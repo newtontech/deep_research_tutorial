@@ -23,6 +23,9 @@ def paper_list_before_agent(callback_context: CallbackContext):
     toolcall_infos = callback_context.state['database_agent_tool_call']
     while toolcall_infos[-1]['tool_name'] != 'query_table' or toolcall_infos[-1]['tool_response']['paper_count'] == 0:
         toolcall_infos.pop()
+        if len(toolcall_infos) == 0:
+            callback_context._event_actions.escalate = True
+            return
     query_table_info = toolcall_infos[-1]
 
     paper_list = query_table_info['tool_response'].get('papers', [])

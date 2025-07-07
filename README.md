@@ -65,7 +65,8 @@ deep_research_tutorial/
    ```bash
    # Create a .env file with your API keys
    echo "OPENAI_API_KEY=your_openai_key_here" > .env
-   echo "GOOGLE_API_KEY=your_google_key_here" >> .env
+   echo "GOOGLE_API_KEY=your_google_key_here" > .env
+   echo "DEEPSEEK_API_KEY=your_deepseek_key_here" > .env
    ```
 
 ## 🚀 Quick Start

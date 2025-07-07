@@ -30,7 +30,7 @@ def save_query_results(
 
 def init_database_agent(config):
     """Initialize the database agent with the given configuration."""
-    selected_model = config.gpt_4o
+    selected_model = config.deepseek_chat
     db_manager = DatabaseManager()
     query_table = db_manager.init_query_table()
 

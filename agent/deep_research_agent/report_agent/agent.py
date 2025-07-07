@@ -17,7 +17,7 @@ def save_response(callback_context: CallbackContext, llm_response: LlmResponse) 
 def init_report_agent(config):
     """Initialize the researcher agent with the given configuration."""
     # Select the model based on the configuration
-    selected_model = config.gemini_2_5_pro
+    selected_model = config.deepseek_chat
     # selected_model = config.gpt_4o
 
     root_agent = LlmAgent(
