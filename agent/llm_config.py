@@ -11,9 +11,12 @@ MODEL_MAPPING = {
     ("openai", "gpt-4o"): "openai/gpt-4o",
     ("openai", "gemini-2.5-pro-preview-05-06"): "openai/gemini-2.5-pro-preview-05-06",
     ("openai", "gemini-2.5-flash-preview-05-20"): "openai/gemini-2.5-flash-preview-05-20",
+    ("deepseek", "deepseek-chat"): "deepseek/deepseek-chat",
+    ("gemini", "gemini-2.0-flash"): "google/gemini-2.0-flash",
 }
 
-DEFAULT_MODEL = "azure/gpt-4o-mini"
+DEFAULT_MODEL = "deepseek/deepseek-chat"
+
 
 class LLMConfig:
 
@@ -22,8 +25,10 @@ class LLMConfig:
 
         model_provider = "openai"
         gemini_2_5_flash = "gemini-2.5-flash-preview-05-20"
+        gemini_2_flash = "gemini-2.0-flash"
         gpt_4o = "gpt-4o"
         gemini_2_5_pro = "gemini-2.5-pro-preview-05-06"
+        deepseek_chat = "deepseek-chat"
     
         # Helper to init any provider model
         def _init_model(provider_key: str, model_name: str):
@@ -32,6 +37,8 @@ class LLMConfig:
         self.gpt_4o = _init_model(model_provider, gpt_4o)
         self.gemini_2_5_flash = _init_model(model_provider, gemini_2_5_flash)
         self.gemini_2_5_pro = _init_model(model_provider, gemini_2_5_pro)
+        self.deepseek_chat = _init_model(model_provider, deepseek_chat)
+        self.gemini_2_flash = _init_model(model_provider, gemini_2_flash)
 
 
 def create_default_config() -> LLMConfig:

@@ -3,6 +3,9 @@ from .llm_config import create_default_config
 from .callbacks import init_prepare_state_before_agent
 from .database_agent.agent import init_database_agent
 from .deep_research_agent.agent import init_deep_research_agent
+from dotenv import load_dotenv
+
+load_dotenv()
 
 global_instruction = """
 ---
@@ -93,7 +96,7 @@ def init_chemistry_research_agent():
 
     root_agent = Agent(
         name="chemistry_research_agent",
-        model=llm_config.gpt_4o,
+        model=llm_config.deepseek_chat,
         description="A chemistry research agent that can understand user's research questions and delegate research tasks to subagents.",
         sub_agents=[
             database_agent,

@@ -6,7 +6,7 @@ class DatabaseManager:
     """
     A manager for database operations.
     """
-    def __init__(self, base_url: str = "http://localhost:5000"):
+    def __init__(self, base_url: str = "http://localhost:5002"):
         self.base_url = base_url.rstrip('/')
         self.session = requests.Session()
         self.table_schema = {}

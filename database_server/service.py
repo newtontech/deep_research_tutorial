@@ -179,13 +179,13 @@ def main():
     print("available tables:", db.list_tables())
     
     def start_api():
-        app = create_api_service(db, port=5000)
-        app.run(host='0.0.0.0', port=5000, debug=False)
+        app = create_api_service(db, port=5002)
+        app.run(host='0.0.0.0', port=5002, debug=False)
     
     api_thread = threading.Thread(target=start_api, daemon=True)
     api_thread.start()
     
-    print("API服务已启动在 http://localhost:5000")
+    print("API服务已启动在 http://localhost:5002")
     print("\n可用的API端点:")
     print("  GET  /tables - 列出所有表")
     print("  GET  /tables/<table_name>/info - 获取表信息")
