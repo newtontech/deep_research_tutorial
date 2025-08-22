@@ -6,14 +6,14 @@ A comprehensive AI-powered chemistry research system that combines database quer
 
 ### Core Capabilities
 - **Multi-Agent Architecture**: Hierarchical agent system with specialized sub-agents
-- **Database Integration**: SQLite-based local database with CSV data loading
+- **Single-Table Database**: Loads one CSV (`paper_text`) into SQLite
 - **Literature Analysis**: Automated paper reading and content extraction
 - **Report Generation**: AI-powered scientific report creation
-- **RESTful API**: Flask-based API for database operations
+- **RESTful API**: Flask-based API (port 5002) for database operations
 
 ### Agent System
 - **Chemistry Research Agent**: Main orchestrator agent that coordinates research tasks
-- **Database Agent**: Handles structured data queries and fact retrieval
+- **Database Agent**: Queries the single `paper_text` table to find relevant DOIs and short excerpts
 - **Deep Research Agent**: Performs literature reviews and generates reports
 - **Paper Agent**: Processes individual research papers
 - **Report Agent**: Synthesizes findings into comprehensive reports
@@ -34,9 +34,7 @@ deep_research_tutorial/
 │   └── tools/                     # Agent tools and utilities
 ├── database_server/               # Database and API services
 │   ├── service.py                 # Flask API and database service
-│   ├── polymer.csv               # Polymer data
-│   ├── paper_metadata.csv        # Paper metadata
-│   └── paper_text.csv            # Paper content data
+│   └── paper_text.csv            # Paper content data (single table loaded)
 ├── my_data.db                    # SQLite database file
 ├── pyproject.toml                # Project dependencies
 └── README.md                     # This file
@@ -78,9 +76,9 @@ python database_server/service.py
 ```
 
 This will:
-- Load CSV data into SQLite database
-- Start Flask API server on `http://localhost:5000`
-- Make database accessible via REST API
+- Load `paper_text.csv` into SQLite as the only table
+- Start Flask API server on `http://localhost:5002`
+- Make the database accessible via REST API
 
 ### 2. Use the Agent System in Google ADK Web UI
 
@@ -97,10 +95,10 @@ The main chemistry research agent:
 - Proposes actions one at a time
 
 ### 2. Database Querying
-The database agent:
-- Searches structured data for facts
-- Retrieves relevant paper metadata
-- Returns formatted results
+The database agent (single-table):
+- Searches `paper_text.main_txt` by keywords and/or filters by `doi`
+- Retrieves relevant paper DOIs with short text excerpts
+- Returns results as a markdown table
 
 ### 3. Literature Research
 The deep research agent:
@@ -140,9 +138,8 @@ Edit `agent/llm_config.py` to customize:
 
 ### Database Configuration
 Modify `database_server/service.py` to:
-- Change database file path
-- Add new data sources
-- Customize API endpoints
+- Change the CSV file path for `paper_text`
+- Customize API endpoints (default port: 5002)
 
 ## 📝 Dependencies
 

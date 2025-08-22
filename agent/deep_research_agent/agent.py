@@ -43,7 +43,17 @@ class GroupPaperAgent(BaseAgent):
         self.name = name
 
     async def _run_async_impl(self, ctx):
-        paper_list = ctx.session.state['paper_list']
+        # Be defensive: when database agent didn't yield DOIs, skip gracefully
+        paper_list = ctx.session.state.get('paper_list')
+        if not paper_list:
+            # nothing to process; stop this agent block gracefully
+            yield Event(
+                author=self.name,
+                content=types.Content(role=self.name,
+                                      parts=[types.Part(text="Proceeding")]),
+                actions=EventActions()
+            )
+            return
         POOL = list(paper_list.keys())
         run_id = secrets.token_hex(2)
 

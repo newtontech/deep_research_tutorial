@@ -169,12 +169,12 @@ def main():
     db = LocalDatabaseService("my_data.db")
     
     # change to your local files
-    db.load_table_from_csv("../data/paper_metadata.csv", "paper_metadata")
+    # db.load_table_from_csv("../data/paper_metadata.csv", "paper_metadata")
     db.load_table_from_csv("../data/paper_text.csv", "paper_text")
-    db.load_table_from_csv("../data/paper_figure.csv", "paper_figure")
-    db.load_table_from_csv("../data/molecures.csv", "molecures")
-    db.load_table_from_csv("../data/solutions.csv", "solutions")
-    db.load_table_from_csv("../data/performance.csv", "performance")
+    # db.load_table_from_csv("../data/paper_figure.csv", "paper_figure")
+    # db.load_table_from_csv("../data/molecures.csv", "molecures")
+    # db.load_table_from_csv("../data/solutions.csv", "solutions")
+    # db.load_table_from_csv("../data/performance.csv", "performance")
 
     print("available tables:", db.list_tables())
     
